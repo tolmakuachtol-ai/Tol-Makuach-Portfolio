@@ -346,93 +346,72 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    /* =====================================================
-       9. CONTACT FORM
-       ===================================================== */
+  /* =====================================================
+   9. CONTACT FORM — EMAILJS INTEGRATION
+   ===================================================== */
 
-    const contactForm =
-        document.querySelector("#contact-form");
+const contactForm = document.querySelector("#contact-form");
 
-    if (contactForm) {
+if (contactForm) {
 
-        contactForm.addEventListener(
-            "submit",
-            (event) => {
+    contactForm.addEventListener("submit", async (event) => {
 
-                event.preventDefault();
+        event.preventDefault();
 
-                const nameInput =
-                    document.querySelector("#name");
+        const submitButton =
+            contactForm.querySelector('button[type="submit"]');
 
-                const emailInput =
-                    document.querySelector("#email");
+        // Validate form fields
+        if (!contactForm.reportValidity()) {
+            return;
+        }
 
-                const messageInput =
-                    document.querySelector("#message");
+        // Save original button text
+        const originalButtonText = submitButton.textContent;
 
-                const name =
-                    nameInput
-                        ? nameInput.value.trim()
-                        : "";
+        // Disable button while sending
+        submitButton.disabled = true;
+        submitButton.textContent = "Sending...";
 
-                const email =
-                    emailInput
-                        ? emailInput.value.trim()
-                        : "";
+        try {
 
-                const message =
-                    messageInput
-                        ? messageInput.value.trim()
-                        : "";
+            // Send message through EmailJS
+            const response = await emailjs.sendForm(
+                "service_hzf1jmn",
+                "template_smdsa5l",
+                contactForm
+            );
 
+            console.log("Email sent successfully:", response);
 
-                /* Check required fields */
+            // Success notification
+            alert(
+                "Thank you! Your message has been sent successfully."
+            );
 
-                if (
-                    !name ||
-                    !email ||
-                    !message
-                ) {
+            // Clear form
+            contactForm.reset();
 
-                    alert(
-                        "Please fill in all required fields."
-                    );
+        } catch (error) {
 
-                    return;
-                }
+            // Display error
+            console.error("EmailJS Error:", error);
 
+            alert(
+                "Sorry! Your message could not be sent. Please try again."
+            );
 
-                /* Validate email */
+        } finally {
 
-                const emailPattern =
-                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            // Restore button
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
 
-                if (
-                    !emailPattern.test(email)
-                ) {
+        }
 
-                    alert(
-                        "Please enter a valid email address."
-                    );
+    });
 
-                    return;
-                }
-
-
-                /* Success message */
-
-                alert(
-                    `Thank you, ${name}! Your message has been received.`
-                );
-
-                contactForm.reset();
-
-            }
-        );
-    }
-
-
-    /* =====================================================
+}    /* =====================================================
        10. PROJECT CARD EFFECT
        ===================================================== */
 
